@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{0fe31fdb-aa1a-4cbb-a697-b26fc3b01348}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpGeneratorRfc4226.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpGeneratorRfc6238.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpType.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpUtilsBase32.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpUtilsBase64.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpUtilsNtExceptionCategory.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpUtilsSerialization.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)WinOTP.hpp" />
+  </ItemGroup>
+</Project>

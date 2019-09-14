@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29230.47
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WindowsOTPTest", "WindowsOTPTest\WindowsOTPTest.vcxproj", "{1E8680EB-7A3E-4688-8B28-A4F4A69AC276}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WindowsOTP", "WindowsOTP\WindowsOTP.vcxitems", "{0FE31FDB-AA1A-4CBB-A697-B26FC3B01348}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		WindowsOTP\WindowsOTP.vcxitems*{0fe31fdb-aa1a-4cbb-a697-b26fc3b01348}*SharedItemsImports = 9
+		WindowsOTP\WindowsOTP.vcxitems*{1e8680eb-7a3e-4688-8b28-a4f4a69ac276}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1E8680EB-7A3E-4688-8B28-A4F4A69AC276}.Debug|x64.ActiveCfg = Debug|x64
+		{1E8680EB-7A3E-4688-8B28-A4F4A69AC276}.Debug|x64.Build.0 = Debug|x64
+		{1E8680EB-7A3E-4688-8B28-A4F4A69AC276}.Debug|x86.ActiveCfg = Debug|Win32
+		{1E8680EB-7A3E-4688-8B28-A4F4A69AC276}.Debug|x86.Build.0 = Debug|Win32
+		{1E8680EB-7A3E-4688-8B28-A4F4A69AC276}.Release|x64.ActiveCfg = Release|x64
+		{1E8680EB-7A3E-4688-8B28-A4F4A69AC276}.Release|x64.Build.0 = Release|x64
+		{1E8680EB-7A3E-4688-8B28-A4F4A69AC276}.Release|x86.ActiveCfg = Release|Win32
+		{1E8680EB-7A3E-4688-8B28-A4F4A69AC276}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F676026-D524-469D-841B-B91C43E8B09E}
+	EndGlobalSection
+EndGlobal
