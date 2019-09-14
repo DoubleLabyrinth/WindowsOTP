@@ -16,23 +16,28 @@ namespace WinOTP::Utils {
 
         if constexpr (__Endian == OtpEnumEndian::Little) {
             *reinterpret_cast<__IntegerType*>(lpBytes) = Integer;
+            return;
         }
 
         if constexpr (__Endian == OtpEnumEndian::Big) {
             if constexpr (sizeof(__IntegerType) == 1) {
                 *reinterpret_cast<__IntegerType*>(lpBytes) = Integer;
+                return;
             }
 
             if constexpr (sizeof(__IntegerType) == 2) {
                 *reinterpret_cast<__IntegerType*>(lpBytes) = _byteswap_ushort(Integer);
+                return;
             }
 
             if constexpr (sizeof(__IntegerType) == 4) {
                 *reinterpret_cast<__IntegerType*>(lpBytes) = _byteswap_ulong(Integer);
+                return;
             }
 
             if constexpr (sizeof(__IntegerType) == 8) {
                 *reinterpret_cast<__IntegerType*>(lpBytes) = _byteswap_uint64(Integer);
+                return;
             }
 
             __assume(0);
