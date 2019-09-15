@@ -8,10 +8,12 @@ namespace WinOTP::Utils {
     class OtpExceptionCategoryWinNT final : public std::error_category {
     public:
 
+        [[nodiscard]]
         virtual const char* name() const noexcept override {
             return "NT Exception";
         }
 
+        [[nodiscard]]
         virtual std::string message(int _Errval) const override {
             PSTR lpszErrorText = nullptr;
             auto cchErrorText = FormatMessageA(
@@ -34,6 +36,7 @@ namespace WinOTP::Utils {
 
     };
 
+    [[nodiscard]]
     inline const OtpExceptionCategoryWinNT& OtpExceptionWinNTCategory() noexcept {
         static OtpExceptionCategoryWinNT Category;
         return Category;

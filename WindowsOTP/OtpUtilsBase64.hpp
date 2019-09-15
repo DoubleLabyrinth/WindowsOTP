@@ -6,6 +6,7 @@
 
 namespace WinOTP::Utils {
 
+    [[nodiscard]]
     inline std::string OtpBase64EncodeA(const std::vector<OtpTypeByte>& Bytes) {
         static const std::string::value_type Alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         static constexpr std::string::value_type PaddingChar = '=';
@@ -52,6 +53,7 @@ namespace WinOTP::Utils {
         return szBase64;
     }
 
+    [[nodiscard]]
     inline std::wstring OtpBase64EncodeW(const std::vector<OtpTypeByte>& Bytes) {
         static const std::wstring::value_type Alphabet[] = L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         static constexpr std::wstring::value_type PaddingChar = L'=';
@@ -98,6 +100,7 @@ namespace WinOTP::Utils {
         return szBase64;
     }
 
+    [[nodiscard]]
     inline std::vector<OtpTypeByte> OtpBase64DecodeA(std::string_view szBase64) {
         static constexpr std::string::value_type PaddingChar = '=';
 
@@ -157,6 +160,7 @@ namespace WinOTP::Utils {
         return Bytes;
     }
 
+    [[nodiscard]]
     inline std::vector<OtpTypeByte> OtpBase64DecodeW(std::wstring_view szBase64) {
         static constexpr std::wstring::value_type PaddingChar = L'=';
 
@@ -217,18 +221,22 @@ namespace WinOTP::Utils {
     }
 
 #if defined(_UNICODE) || defined(UNICODE)
+    [[nodiscard]]
     inline std::wstring OtpBase64Encode(const std::vector<OtpTypeByte>& Bytes) {
         return OtpBase64EncodeW(Bytes);
     }
 
+    [[nodiscard]]
     inline std::vector<OtpTypeByte> OtpBase64Decode(std::wstring_view szBase64) {
         return OtpBase64DecodeW(szBase64);
     }
 #else
+    [[nodiscard]]
     inline std::string OtpBase64Encode(const std::vector<OtpTypeByte>& Bytes) {
         return OtpBase64EncodeA(Bytes);
     }
 
+    [[nodiscard]]
     inline std::vector<OtpTypeByte> OtpBase64Decode(std::string_view szBase64) {
         return OtpBase64DecodeA(szBase64);
     }

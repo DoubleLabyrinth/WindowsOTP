@@ -57,15 +57,18 @@ namespace WinOTP {
             return *this;
         }
 
+        [[nodiscard]]
         OtpTypeUInt32 GenerateCode(OtpTypeUInt64 UnixTimestamp, OtpTypeUInt64 UnixTimestampStartCounting = 0) {
             auto T = (UnixTimestamp - UnixTimestampStartCounting) / m_Interval;
             return OtpGeneratorRfc4226::GenerateCode(T);
         }
 
+        [[nodiscard]]
         OtpTypeUInt32 GenerateCode() {
             return GenerateCode(_time64(nullptr), 0);
         }
 
+        [[nodiscard]]
         std::string GenerateCodeStringA(OtpTypeUInt64 UnixTimestamp, OtpTypeUInt64 UnixTimestampStartCounting = 0) {
             auto Code = GenerateCode(UnixTimestamp, UnixTimestampStartCounting);
             auto CodeString = std::to_string(Code);
@@ -77,6 +80,7 @@ namespace WinOTP {
             return CodeString;
         }
 
+        [[nodiscard]]
         std::string GenerateCodeStringA() {
             auto Code = GenerateCode();
             auto CodeString = std::to_string(Code);
@@ -88,6 +92,7 @@ namespace WinOTP {
             return CodeString;
         }
 
+        [[nodiscard]]
         std::wstring GenerateCodeStringW(OtpTypeUInt64 UnixTimestamp, OtpTypeUInt64 UnixTimestampStartCounting = 0) {
             auto Code = GenerateCode(UnixTimestamp, UnixTimestampStartCounting);
             auto CodeString = std::to_wstring(Code);
@@ -99,6 +104,7 @@ namespace WinOTP {
             return CodeString;
         }
 
+        [[nodiscard]]
         std::wstring GenerateCodeStringW() {
             auto Code = GenerateCode();
             auto CodeString = std::to_wstring(Code);
@@ -121,10 +127,12 @@ namespace WinOTP {
             return *this;
         }
 
+        [[nodiscard]]
         std::wstring GenerateCodeString(OtpTypeUInt64 UnixTimestamp, OtpTypeUInt64 UnixTimestampStartCounting = 0) {
             return GenerateCodeStringW(UnixTimestamp, UnixTimestampStartCounting);
         }
 
+        [[nodiscard]]
         std::wstring GenerateCodeString() {
             return GenerateCodeStringW();
         }
@@ -139,10 +147,12 @@ namespace WinOTP {
             return *this;
         }
 
+        [[nodiscard]]
         std::string GenerateCodeString(OtpTypeUInt64 UnixTimestamp, OtpTypeUInt64 UnixTimestampStartCounting = 0) {
             return GenerateCodeStringA(UnixTimestamp, UnixTimestampStartCounting);
         }
 
+        [[nodiscard]]
         std::string GenerateCodeString() {
             return GenerateCodeStringA();
         }

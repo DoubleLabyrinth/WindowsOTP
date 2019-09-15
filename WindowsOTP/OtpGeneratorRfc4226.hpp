@@ -19,6 +19,7 @@ namespace WinOTP {
         const OtpTypeUInt32   m_Digit;
         std::vector<OtpTypeByte> m_RawSecret;
 
+        [[nodiscard]]
         static BCRYPT_ALG_HANDLE CngHmacAlgorithmCategory(OtpHashMode HashMode) {
             switch (HashMode) {
                 case OtpHashMode::Sha1:
@@ -32,6 +33,7 @@ namespace WinOTP {
             }
         }
 
+        [[nodiscard]]
         static OtpTypeSize CngHmacHashSize(BCRYPT_ALG_HANDLE hAlgorithm) {
             NTSTATUS ntStatus = 0;
             ULONG cbReturnData;
@@ -48,6 +50,7 @@ namespace WinOTP {
             return cbHash;
         }
 
+        [[nodiscard]]
         static constexpr OtpTypeUInt32 DigitSpace(OtpTypeUInt32 Digit) noexcept {
             OtpTypeUInt32 Result = 1;
 
@@ -187,6 +190,7 @@ namespace WinOTP {
             }
         }
 
+        [[nodiscard]]
         OtpTypeUInt32 GenerateCode(OtpTypeUInt64 Counter) const {
             if (m_RawSecret.size() == 0) {
                 throw std::runtime_error("Secret is not given.");
@@ -221,6 +225,7 @@ namespace WinOTP {
             }
         }
 
+        [[nodiscard]]
         std::string GenerateCodeStringA(OtpTypeUInt64 Counter) const {
             auto Code = GenerateCode(Counter);
             auto CodeString = std::to_string(Code);
@@ -232,6 +237,7 @@ namespace WinOTP {
             return CodeString;
         }
 
+        [[nodiscard]]
         std::wstring GenerateCodeStringW(OtpTypeUInt64 Counter) const {
             auto Code = GenerateCode(Counter);
             auto CodeString = std::to_wstring(Code);
@@ -244,6 +250,7 @@ namespace WinOTP {
         }
 
 #if defined(_UNICODE) || defined(UNICODE)
+        [[nodiscard]]
         std::wstring ExportSecretBase32() const {
             return ExportSecretBase32W();
         }
@@ -256,10 +263,12 @@ namespace WinOTP {
             return ImportSecretBase64W(Base64Secret);
         }
 
+        [[nodiscard]]
         std::wstring GenerateCodeString(OtpTypeUInt64 Counter) const {
             return GenerateCodeStringW(Counter);
         }
 #else
+        [[nodiscard]]
         std::string ExportSecretBase32() const {
             return ExportSecretBase32A();
         }
@@ -272,6 +281,7 @@ namespace WinOTP {
             return ImportSecretBase64A(Base64Secret);
         }
 
+        [[nodiscard]]
         std::string GenerateCodeString(OtpTypeUInt64 Counter) const {
             return GenerateCodeStringA(Counter);
         }
