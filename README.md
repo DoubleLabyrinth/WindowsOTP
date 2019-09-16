@@ -2,7 +2,9 @@
 
 A C++17 based OTP header-only library for Windows.
 
-__Minimum OS requirement: Windows10.__ Because it uses `BCryptHash` api.
+~~__Minimum OS requirement: Windows10.__ Because it uses `BCryptHash` API.~~
+
+__Minimum OS requirement: Windows Vista.__ Because it uses Windows CNG APIs.
 
 ## 1. Example
 
