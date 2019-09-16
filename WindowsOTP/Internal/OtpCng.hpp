@@ -30,6 +30,7 @@ namespace WinOTP::Internal {
 
     public:
 
+        [[nodiscard]]
         static OtpCngHashProvider* CreateProvider(PCWSTR lpszAlgId, PCWSTR lpszImplementation, DWORD dwFlags) {
             OtpResource<OtpResourceTraitsCppObject<OtpCngHashProvider>> Instance(new OtpCngHashProvider());
 
@@ -61,14 +62,17 @@ namespace WinOTP::Internal {
             return Instance.Transfer();
         }
 
+        [[nodiscard]]
         BCRYPT_ALG_HANDLE GetNativeHandle() const noexcept {
             return Get();
         }
 
+        [[nodiscard]]
         DWORD GetHashObjectSize() const noexcept {
             return m_HashObjectSize;
         }
 
+        [[nodiscard]]
         DWORD GetHashSize() const noexcept {
             return m_HashSize;
         }
@@ -79,6 +83,7 @@ namespace WinOTP::Internal {
         }
     };
 
+    [[nodiscard]]
     const OtpCngHashProvider& OtpCngCategoryHmac(OtpCngHashEnum HashAlgorithm) {
         static std::mutex InitializeMutex;
         static OtpResource HmacSha1Provider(OtpResourceTraitsCppObject<OtpCngHashProvider>{});

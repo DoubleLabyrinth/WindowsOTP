@@ -104,6 +104,7 @@ namespace WinOTP::Internal {
             }
         }
 
+        [[nodiscard]]
         HandleType Transfer() noexcept {
             HandleType tmp = m_Handle;
             m_Handle = __ResourceTraits::InvalidValue;
@@ -234,6 +235,7 @@ namespace WinOTP::Internal {
             }
         }
 
+        [[nodiscard]]
         HandleType Transfer() noexcept {
             HandleType tmp = m_Handle;
             m_Handle = __ResourceTraits::InvalidValue;
