@@ -1,12 +1,13 @@
+#pragma once
+#include "OtpType.hpp"
+#include "OtpByteArray.hpp"
 #include <stdexcept>
 #include <string>
-#include <vector>
-#include "OtpType.hpp"
 
-namespace WinOTP::Utils {
+namespace WinOTP {
 
     [[nodiscard]]
-    inline std::string OtpBase32EncodeA(const std::vector<OtpTypeByte>& Bytes) {
+    inline std::string OtpBase32EncodeA(const OtpByteArray& Bytes) {
         static const std::string::value_type Alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
         static constexpr std::string::value_type PaddingChar = '=';
 
@@ -53,7 +54,7 @@ namespace WinOTP::Utils {
     }
 
     [[nodiscard]]
-    inline std::wstring OtpBase32EncodeW(const std::vector<OtpTypeByte>& Bytes) {
+    inline std::wstring OtpBase32EncodeW(const OtpByteArray& Bytes) {
         static const std::wstring::value_type Alphabet[] = L"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
         static constexpr std::wstring::value_type PaddingChar = L'=';
 
@@ -100,10 +101,10 @@ namespace WinOTP::Utils {
     }
 
     [[nodiscard]]
-    inline std::vector<OtpTypeByte> OtpBase32DecodeA(std::string_view szBase32) {
+    inline OtpByteArray OtpBase32DecodeA(std::string_view szBase32) {
         static constexpr std::string::value_type PaddingChar = '=';
 
-        std::vector<OtpTypeByte> Bytes;
+        OtpByteArray Bytes;
 
         if (szBase32.length()) {
             Bytes.reserve((szBase32.length() * 5 + 7) / 8);
@@ -156,10 +157,10 @@ namespace WinOTP::Utils {
     }
 
     [[nodiscard]]
-    inline std::vector<OtpTypeByte> OtpBase32DecodeW(std::wstring_view szBase32) {
+    inline OtpByteArray OtpBase32DecodeW(std::wstring_view szBase32) {
         static constexpr std::wstring::value_type PaddingChar = L'=';
 
-        std::vector<OtpTypeByte> Bytes;
+        OtpByteArray Bytes;
 
         if (szBase32.length()) {
             Bytes.reserve((szBase32.length() * 5 + 7) / 8);
@@ -213,22 +214,22 @@ namespace WinOTP::Utils {
 
 #if defined(_UNICODE) || defined(UNICODE)
     [[nodiscard]]
-    inline std::wstring OtpBase32Encode(const std::vector<OtpTypeByte>& Bytes) {
+    inline std::wstring OtpBase32Encode(const OtpByteArray& Bytes) {
         return OtpBase32EncodeW(Bytes);
     }
 
     [[nodiscard]]
-    inline std::vector<OtpTypeByte> OtpBase32Decode(std::wstring_view szBase32) {
+    inline OtpByteArray OtpBase32Decode(std::wstring_view szBase32) {
         return OtpBase32DecodeW(szBase32);
     }
 #else
     [[nodiscard]]
-    inline std::string OtpBase32Encode(const std::vector<OtpTypeByte>& Bytes) {
+    inline std::string OtpBase32Encode(const OtpByteArray& Bytes) {
         return OtpBase32EncodeA(Bytes);
     }
 
     [[nodiscard]]
-    inline std::vector<OtpTypeByte> OtpBase32Decode(std::string_view szBase32) {
+    inline OtpByteArray OtpBase32Decode(std::string_view szBase32) {
         return OtpBase32DecodeA(szBase32);
     }
 #endif

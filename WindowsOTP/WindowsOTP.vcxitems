@@ -14,13 +14,18 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpByteArray.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Internal\OtpCng.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Internal\OtpResource.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Internal\OtpResourceTraitsCng.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Internal\OtpResourceTraitsGeneric.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)OtpGeneratorRfc4226.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)OtpGeneratorRfc6238.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)OtpType.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)OtpUtilsBase32.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)OtpUtilsBase64.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)OtpUtilsNtExceptionCategory.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)OtpUtilsSerialization.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpBase32.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpBase64.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Internal\OtpExceptionCategory.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)OtpSerialization.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)WinOTP.hpp" />
   </ItemGroup>
 </Project>

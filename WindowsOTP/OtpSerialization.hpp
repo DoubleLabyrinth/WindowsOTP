@@ -1,25 +1,26 @@
 #pragma once
-#include "OtpType.hpp"
 #include <stdlib.h>
 
-namespace WinOTP::Utils {
+namespace WinOTP {
 
-    template<OtpEnumEndian __Endian, typename __IntegerType>
-    void OtpIntegerToBytes(__IntegerType Integer, OtpTypeAny* lpBytes) noexcept {
+    enum class OtpSerializationEndian { Little, Big };
+
+    template<OtpSerializationEndian __Endian, typename __IntegerType>
+    void OtpSerializationIntegerToBytes(__IntegerType Integer, OtpTypeAny* lpBytes) noexcept {
         static_assert(std::is_integral_v<__IntegerType>);
         static_assert(
             sizeof(__IntegerType) == 1 ||
             sizeof(__IntegerType) == 2 ||
             sizeof(__IntegerType) == 4 ||
             sizeof(__IntegerType) == 8
-            );
+        );
 
-        if constexpr (__Endian == OtpEnumEndian::Little) {
+        if constexpr (__Endian == OtpSerializationEndian::Little) {
             *reinterpret_cast<__IntegerType*>(lpBytes) = Integer;
             return;
         }
 
-        if constexpr (__Endian == OtpEnumEndian::Big) {
+        if constexpr (__Endian == OtpSerializationEndian::Big) {
             if constexpr (sizeof(__IntegerType) == 1) {
                 *reinterpret_cast<__IntegerType*>(lpBytes) = Integer;
                 return;
@@ -46,22 +47,22 @@ namespace WinOTP::Utils {
         __assume(0);
     }
 
-    template<OtpEnumEndian __Endian, typename __IntegerType>
+    template<OtpSerializationEndian __Endian, typename __IntegerType>
     [[nodiscard]]
-    __IntegerType OtpBytesToInteger(const OtpTypeAny* lpBytes) noexcept {
+    __IntegerType OtpSerializationBytesToInteger(const OtpTypeAny* lpBytes) noexcept {
         static_assert(std::is_integral_v<__IntegerType>);
         static_assert(
             sizeof(__IntegerType) == 1 ||
             sizeof(__IntegerType) == 2 ||
             sizeof(__IntegerType) == 4 ||
             sizeof(__IntegerType) == 8
-            );
+        );
 
-        if constexpr (__Endian == OtpEnumEndian::Little) {
+        if constexpr (__Endian == OtpSerializationEndian::Little) {
             return *reinterpret_cast<const __IntegerType*>(lpBytes);
         }
 
-        if constexpr (__Endian == OtpEnumEndian::Big) {
+        if constexpr (__Endian == OtpSerializationEndian::Big) {
             if constexpr (sizeof(__IntegerType) == 1) {
                 return *reinterpret_cast<const __IntegerType*>(lpBytes);
             }

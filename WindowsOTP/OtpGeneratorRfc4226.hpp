@@ -1,9 +1,14 @@
 #pragma once
 #include "OtpType.hpp"
-#include "OtpUtilsBase32.hpp"
-#include "OtpUtilsBase64.hpp"
-#include "OtpUtilsNtExceptionCategory.hpp"
-#include "OtpUtilsSerialization.hpp"
+#include "Internal/OtpExceptionCategory.hpp"
+#include "Internal/OtpResource.hpp"
+#include "Internal/OtpResourceTraitsCng.hpp"
+#include "Internal/OtpCng.hpp"
+#include "OtpByteArray.hpp"
+#include "OtpBase32.hpp"
+#include "OtpBase64.hpp"
+#include "OtpSerialization.hpp"
+
 #include <windows.h>
 #include <bcrypt.h>
 #include <stdexcept>
@@ -12,46 +17,40 @@
 
 namespace WinOTP {
 
+    enum class OtpHashMode {
+        Sha1,
+        Sha256,
+        Sha384,
+        Sha512
+    };
+
     class OtpGeneratorRfc4226 {
     protected:
 
-        const OtpHashMode m_HashMode;
-        const OtpTypeUInt32   m_Digit;
-        std::vector<OtpTypeByte> m_RawSecret;
+        const OtpHashMode   m_HashMode;
+        const OtpTypeUInt32 m_Digit;
+        OtpByteArraySecure  m_RawSecret;
+        OtpByteArraySecure  m_HashObject;
+        Internal::OtpResource<Internal::OtpResourceTraitsCngHashHandle> m_HashHandle;
 
         [[nodiscard]]
-        static BCRYPT_ALG_HANDLE CngHmacAlgorithmCategory(OtpHashMode HashMode) {
+        static constexpr Internal::OtpCngHashEnum ConvertToCngHashEnum(OtpHashMode HashMode) {
             switch (HashMode) {
                 case OtpHashMode::Sha1:
-                    return BCRYPT_HMAC_SHA1_ALG_HANDLE;
+                    return Internal::OtpCngHashEnum::Sha1;
                 case OtpHashMode::Sha256:
-                    return BCRYPT_HMAC_SHA256_ALG_HANDLE;
+                    return Internal::OtpCngHashEnum::Sha256;
+                case OtpHashMode::Sha384:
+                    return Internal::OtpCngHashEnum::Sha384;
                 case OtpHashMode::Sha512:
-                    return BCRYPT_HMAC_SHA512_ALG_HANDLE;
+                    return Internal::OtpCngHashEnum::Sha512;
                 default:
-                    throw std::invalid_argument("Unknown hash mode detected.");
+                    __assume(0);
             }
         }
 
         [[nodiscard]]
-        static OtpTypeSize CngHmacHashSize(BCRYPT_ALG_HANDLE hAlgorithm) {
-            NTSTATUS ntStatus = 0;
-            ULONG cbReturnData;
-            DWORD cbHash = 0;
-
-            ntStatus = BCryptGetProperty(hAlgorithm, BCRYPT_HASH_LENGTH, reinterpret_cast<PUCHAR>(&cbHash), sizeof(DWORD), &cbReturnData, 0);
-            if (!BCRYPT_SUCCESS(ntStatus)) {
-                throw std::system_error(
-                    ntStatus, 
-                    Utils::OtpExceptionWinNTCategory()
-                );
-            }
-
-            return cbHash;
-        }
-
-        [[nodiscard]]
-        static constexpr OtpTypeUInt32 DigitSpace(OtpTypeUInt32 Digit) noexcept {
+        static constexpr OtpTypeUInt32 DigitRangeSpace(OtpTypeUInt32 Digit) noexcept {
             OtpTypeUInt32 Result = 1;
 
             for (OtpTypeUInt32 i = 0; i < Digit; ++i) {
@@ -59,6 +58,43 @@ namespace WinOTP {
             }
 
             return Result;
+        }
+
+        OtpGeneratorRfc4226& ImportSecretRaw(OtpByteArraySecure& RawSecret) {
+            if (RawSecret.size() > ULONG_MAX) {
+                throw std::length_error("Secret is too long.");
+            } else {
+                using namespace Internal;
+
+                const auto& HashProvider = OtpCngCategoryHmac(ConvertToCngHashEnum(m_HashMode));
+                OtpByteArraySecure HashObject(HashProvider.GetHashObjectSize());
+                OtpResource<OtpResourceTraitsCngHashHandle> HashHandle;
+
+                auto ntStatus = BCryptCreateHash(
+                    HashProvider.GetNativeHandle(),
+                    HashHandle.GetAddressOf(),
+                    HashObject.data(),
+                    static_cast<ULONG>(HashObject.size()),
+                    RawSecret.data(),
+                    static_cast<ULONG>(RawSecret.size()),
+                    BCRYPT_HASH_REUSABLE_FLAG
+                );
+                if (!BCRYPT_SUCCESS(ntStatus)) {
+                    throw std::system_error(
+                        ntStatus,
+                        OtpExceptionWinNTCategory()
+                    );
+                }
+
+                m_RawSecret.swap(RawSecret);
+                m_HashObject.swap(HashObject);
+                std::swap(m_HashHandle, HashHandle);
+
+                auto p = m_HashObject.data();
+                auto pp = m_HashHandle.Get();
+
+                return *this;
+            }
         }
 
     public:
@@ -96,7 +132,7 @@ namespace WinOTP {
             if (m_RawSecret.size() == 0) {
                 throw std::runtime_error("Secret has not been set.");
             } else {
-                return Utils::OtpBase32EncodeA(m_RawSecret);
+                return OtpBase32EncodeA(m_RawSecret);
             }
         }
 
@@ -105,7 +141,7 @@ namespace WinOTP {
             if (m_RawSecret.size() == 0) {
                 throw std::runtime_error("Secret has not been set.");
             } else {
-                return Utils::OtpBase32EncodeW(m_RawSecret);
+                return OtpBase32EncodeW(m_RawSecret);
             }
         }
 
@@ -114,7 +150,7 @@ namespace WinOTP {
             if (m_RawSecret.size() == 0) {
                 throw std::runtime_error("Secret has not been set.");
             } else {
-                return Utils::OtpBase64EncodeA(m_RawSecret);
+                return OtpBase64EncodeA(m_RawSecret);
             }
         }
 
@@ -123,7 +159,7 @@ namespace WinOTP {
             if (m_RawSecret.size() == 0) {
                 throw std::runtime_error("Secret has not been set.");
             } else {
-                return Utils::OtpBase64EncodeW(m_RawSecret);
+                return OtpBase64EncodeW(m_RawSecret);
             }
         }
 
@@ -131,63 +167,33 @@ namespace WinOTP {
             if (cbRawSecret > ULONG_MAX) {
                 throw std::length_error("Secret is too long.");
             } else {
-                std::vector<OtpTypeByte> RawSecret(
+                OtpByteArraySecure RawSecret(
                     reinterpret_cast<const OtpTypeByte*>(lpRawSecret),
                     reinterpret_cast<const OtpTypeByte*>(lpRawSecret) + cbRawSecret
                 );
 
-                std::swap(m_RawSecret, RawSecret);
-                SecureZeroMemory(RawSecret.data(), RawSecret.size());
-                return *this;
+                return ImportSecretRaw(RawSecret);
             }
         }
 
         OtpGeneratorRfc4226& ImportSecretBase32A(std::string_view Base32Secret) {
-            auto RawSecret = Utils::OtpBase32DecodeA(Base32Secret);
-
-            if (RawSecret.size() > ULONG_MAX) {
-                throw std::length_error("Secret is too long.");
-            } else {
-                std::swap(m_RawSecret, RawSecret);
-                SecureZeroMemory(RawSecret.data(), RawSecret.size());
-                return *this;
-            }
+            OtpByteArraySecure RawSecret = OtpBase32DecodeA(Base32Secret);
+            return ImportSecretRaw(RawSecret);
         }
 
         OtpGeneratorRfc4226& ImportSecretBase32W(std::wstring_view Base32Secret) {
-            auto RawSecret = Utils::OtpBase32DecodeW(Base32Secret);
-
-            if (RawSecret.size() > ULONG_MAX) {
-                throw std::length_error("Secret is too long.");
-            } else {
-                std::swap(m_RawSecret, RawSecret);
-                SecureZeroMemory(RawSecret.data(), RawSecret.size());
-                return *this;
-            }
+            OtpByteArraySecure RawSecret = OtpBase32DecodeW(Base32Secret);
+            return ImportSecretRaw(RawSecret);
         }
 
         OtpGeneratorRfc4226& ImportSecretBase64A(std::string_view Base64Secret) {
-            auto RawSecret = Utils::OtpBase64DecodeA(Base64Secret);
-
-            if (RawSecret.size() > ULONG_MAX) {
-                throw std::length_error("Secret is too long.");
-            } else {
-                std::swap(m_RawSecret, RawSecret);
-                SecureZeroMemory(RawSecret.data(), RawSecret.size());
-                return *this;
-            }
+            OtpByteArraySecure RawSecret = OtpBase64DecodeA(Base64Secret);
+            return ImportSecretRaw(RawSecret);
         }
 
         OtpGeneratorRfc4226& ImportSecretBase64W(std::wstring_view Base64Secret) {
-            auto RawSecret = Utils::OtpBase64DecodeW(Base64Secret);
-
-            if (RawSecret.size() > ULONG_MAX) {
-                throw std::length_error("Secret is too long.");
-            } else {
-                std::swap(m_RawSecret, RawSecret);
-                SecureZeroMemory(RawSecret.data(), RawSecret.size());
-                return *this;
-            }
+            OtpByteArraySecure RawSecret = OtpBase64DecodeW(Base64Secret);
+            return ImportSecretRaw(RawSecret);
         }
 
         [[nodiscard]]
@@ -195,31 +201,34 @@ namespace WinOTP {
             if (m_RawSecret.size() == 0) {
                 throw std::runtime_error("Secret is not given.");
             } else {
-                NTSTATUS ntStatus = 0;
-                BCRYPT_ALG_HANDLE hAlgorithm = CngHmacAlgorithmCategory(m_HashMode);
-                std::vector<OtpTypeByte> HmacHash(CngHmacHashSize(hAlgorithm));
+                using namespace Internal;
+
+                OtpByteArray HmacHash(OtpCngCategoryHmac(ConvertToCngHashEnum(m_HashMode)).GetHashSize());
                 alignas(OtpTypeUInt64) UCHAR CounterBytes[sizeof(OtpTypeUInt64)];
 
-                Utils::OtpIntegerToBytes<OtpEnumEndian::Big>(Counter, CounterBytes);
+                OtpSerializationIntegerToBytes<OtpSerializationEndian::Big>(Counter, CounterBytes);
 
-                ntStatus = BCryptHash(
-                    hAlgorithm, 
-                    const_cast<PUCHAR>(m_RawSecret.data()), static_cast<DWORD>(m_RawSecret.size()), 
-                    CounterBytes, sizeof(CounterBytes), 
-                    HmacHash.data(), static_cast<DWORD>(HmacHash.size())
-                );
+                auto ntStatus = BCryptHashData(m_HashHandle.Get(), CounterBytes, sizeof(CounterBytes), 0);
                 if (!BCRYPT_SUCCESS(ntStatus)) {
                     throw std::system_error(
                         ntStatus,
-                        Utils::OtpExceptionWinNTCategory()
+                        OtpExceptionWinNTCategory()
+                    );
+                }
+
+                ntStatus = BCryptFinishHash(m_HashHandle.Get(), HmacHash.data(), static_cast<ULONG>(HmacHash.size()), 0);
+                if (!BCRYPT_SUCCESS(ntStatus)) {
+                    throw std::system_error(
+                        ntStatus,
+                        OtpExceptionWinNTCategory()
                     );
                 }
 
                 OtpTypeByte Offset = HmacHash.back() & 0xF;
-                OtpTypeUInt32 Code = Utils::OtpBytesToInteger<OtpEnumEndian::Big, OtpTypeUInt32>(HmacHash.data() + Offset);
+                OtpTypeUInt32 Code = OtpSerializationBytesToInteger<OtpSerializationEndian::Big, OtpTypeUInt32>(HmacHash.data() + Offset);
                 
                 Code &= static_cast<OtpTypeUInt32>(0x7FFFFFFF);
-                Code %= DigitSpace(m_Digit);
+                Code %= DigitRangeSpace(m_Digit);
 
                 return Code;
             }
@@ -286,10 +295,6 @@ namespace WinOTP {
             return GenerateCodeStringA(Counter);
         }
 #endif
-
-        ~OtpGeneratorRfc4226() {
-            SecureZeroMemory(m_RawSecret.data(), m_RawSecret.size());
-        }
 
     };
 
